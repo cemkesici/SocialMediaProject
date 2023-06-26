@@ -15,18 +15,42 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 
 class FotografPaylasmaActivity : AppCompatActivity() {
     private var secilenGorsel:Uri?=null
     private var gorselBitmap:Bitmap?=null
+    private lateinit var storage:FirebaseStorage
+    private lateinit var auth:FirebaseAuth
+    private lateinit var database:FirebaseFirestore
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fotograf_paylasma)
+
+        //Firebase tanımlamaları
+        storage= FirebaseStorage.getInstance()
+        auth= FirebaseAuth.getInstance()
+        database= FirebaseFirestore.getInstance()
     }
 
     fun paylas(view: View){
+        //depo işlemleri
+        //UUID , universal unique id
+        val uuid= UUID.randomUUID()//eklenecek resimleri farklı isim ile eklememiz lazım bu yüzde uuid ile random id alacağız
+        val gorselIsim="$uuid.jpg"
+        val reference=storage.reference
+        val gorselReference=reference.child("images").child(gorselIsim)
 
+        if (secilenGorsel!=null) {
+            gorselReference.putFile(secilenGorsel!!).addOnSuccessListener { _ ->
+                println("yükleme başarılı")
+            }
+        }
     }
+
     @Suppress("DEPRECATION")
     fun gorselSec(view:View){
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){
