@@ -13,11 +13,14 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import java.sql.Timestamp
 import java.util.UUID
 
 class FotografPaylasmaActivity : AppCompatActivity() {
@@ -26,6 +29,7 @@ class FotografPaylasmaActivity : AppCompatActivity() {
     private lateinit var storage:FirebaseStorage
     private lateinit var auth:FirebaseAuth
     private lateinit var database:FirebaseFirestore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fotograf_paylasma)
@@ -46,7 +50,35 @@ class FotografPaylasmaActivity : AppCompatActivity() {
 
         if (secilenGorsel!=null) {
             gorselReference.putFile(secilenGorsel!!).addOnSuccessListener { _ ->
-                println("yükleme başarılı")
+                //görsel yüklendi. Görselin yüklendiği adrese ulaşmalk için yükleme işleminden sonra referance alarak uri erişmemiz gerekli
+                val secilenGorselRef= storage.reference.child("images").child(gorselIsim)
+                secilenGorselRef.downloadUrl.addOnSuccessListener { Uri->
+                    //uri başarılıysa
+                    val downloadUrl = Uri.toString()
+                    val guncelKullaniciEmail = auth.currentUser!!.email.toString()
+                    val yorumText = findViewById<TextView>(R.id.yorumText)
+                    val kullaniciYorum = yorumText.text.toString()
+                    val tarih = com.google.firebase.Timestamp.now()
+
+                    //veritabanı işlemleri
+                    //Firebase veritabanı saklama işlemi hashmap ile yapılır.Key value mantığı ile çalışır
+                    val postHashMap= hashMapOf<String,Any>() // Giren değeri Any yapıyorum, birçık farklı değer girdisi olacak
+                    postHashMap["imgUrl"] = downloadUrl
+                    postHashMap["userMail"] = guncelKullaniciEmail
+                    postHashMap["userContext"] = kullaniciYorum
+                    postHashMap["date"] = tarih
+
+                    //hangi koleksiyondan okuma yazma yapacağımızı seçmemiz gereklidir
+                    database.collection("Post").add(postHashMap).addOnCompleteListener { it->
+                        if (it.isSuccessful){
+                            finish()
+                        }
+                    }.addOnFailureListener{exc->
+                        Toast.makeText(this,exc.localizedMessage,Toast.LENGTH_LONG).show()
+                    }
+                }.addOnFailureListener{exc->
+                    Toast.makeText(this,exc.localizedMessage,Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -81,6 +113,7 @@ class FotografPaylasmaActivity : AppCompatActivity() {
     @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val ImageView=findViewById<ImageView>(R.id.imageView2)
+
         if(requestCode==1 && resultCode==Activity.RESULT_OK && data!=null){
            secilenGorsel= data.data
             if(secilenGorsel!=null){
@@ -90,6 +123,7 @@ class FotografPaylasmaActivity : AppCompatActivity() {
                     ImageView.setImageBitmap(gorselBitmap)
                 }else {
                     gorselBitmap =MediaStore.Images.Media.getBitmap(this.contentResolver, secilenGorsel)
+                    ImageView.setImageBitmap(gorselBitmap)
                 }
             }
         }
