@@ -1,4 +1,4 @@
-package com.cem.socialmediaproject
+package com.cem.socialmediaproject.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.cem.socialmediaproject.R
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
@@ -40,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
                 val kullanici=auth.currentUser?.email.toString()// güncel kullanıcı bilgisi
                 Toast.makeText(this,"Hoşgeldiniz $kullanici", Toast.LENGTH_LONG).show()
 
-                val intent=Intent(this,TimeLineActivity::class.java)
+                val intent=Intent(this, TimeLineActivity::class.java)
                 startActivity(intent)
                 finish()
             }

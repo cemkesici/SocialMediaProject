@@ -1,4 +1,4 @@
-package com.cem.socialmediaproject
+package com.cem.socialmediaproject.view
 
 import android.Manifest
 import android.app.Activity
@@ -17,10 +17,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.cem.socialmediaproject.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import java.sql.Timestamp
 import java.util.UUID
 
 class FotografPaylasmaActivity : AppCompatActivity() {

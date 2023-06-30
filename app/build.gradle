@@ -47,4 +47,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx:22.0.0'
     implementation 'com.google.firebase:firebase-firestore-ktx:24.6.1'
     implementation 'com.google.firebase:firebase-storage-ktx:20.2.1'
+    implementation 'com.squareup.picasso:picasso:2.71828'//görsel indirme kullanma işlemleri için picasso kütüphanesi
 }
